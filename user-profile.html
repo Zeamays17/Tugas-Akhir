@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil Pengguna - SIM Aset</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            gap: 30px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .sidebar {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            padding: 40px 30px;
+            width: 320px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sidebar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .profile-image-container {
+            position: relative;
+            margin: 0 auto 25px;
+            width: 140px;
+            height: 140px;
+        }
+
+        .profile-image {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            object-fit: cover;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .profile-image:hover {
+            transform: scale(1.05);
+            border-color: rgba(255, 255, 255, 0.6);
+        }
+
+        .profile-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .profile-image-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            border-radius: 50%;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .profile-image:hover .profile-image-overlay {
+            opacity: 1;
+        }
+
+        .profile-name {
+            font-size: 28px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .profile-role {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 16px;
+            margin-bottom: 25px;
+            font-weight: 400;
+        }
+
+        .sim-aset {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            padding: 14px 28px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 16px;
+            letter-spacing: 0.5px;
+            box-shadow: 0 8px 20px rgba(231, 76, 60, 0.3);
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .sim-aset:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(231, 76, 60, 0.4);
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 20px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #2ecc71;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 40px;
+        }
+
+        .content-header {
+            margin-bottom: 35px;
+        }
+
+        .content-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .content-subtitle {
+            color: #7f8c8d;
+            font-size: 16px;
+            font-weight: 400;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 35px;
+            background: #f8f9fa;
+            border-radius: 16px;
+            padding: 6px;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 14px 24px;
+            background: none;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            color: #7f8c8d;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .tab:not(.active):hover {
+            color: #3498db;
+            background: rgba(52, 152, 219, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 28px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 15px;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            background: white;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .form-input:hover, .form-select:hover {
+            border-color: #bdc3c7;
+        }
+
+        .file-input-container {
+            position: relative;
+            display: block;
+        }
+
+        .file-input {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-input-label {
+            display: block;
+            padding: 16px 20px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border: 2px dashed #bdc3c7;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 15px;
+            color: #7f8c8d;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .file-input-label:hover {
+            background: linear-gradient(135deg, #e9ecef, #dee2e6);
+            border-color: #3498db;
+            color: #3498db;
+            transform: translateY(-1px);
+        }
+
+        .file-input-label.file-selected {
+            border-color: #27ae60;
+            background: linear-gradient(135deg, #d5f4e6, #a8e6cf);
+            color: #27ae60;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            padding: 16px 32px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(52, 152, 219, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+            color: white;
+            padding: 16px 32px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-left: 12px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(149, 165, 166, 0.3);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(149, 165, 166, 0.4);
+        }
+
+        .btn-back {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            padding: 16px 32px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-left: 12px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+        }
+
+        .btn-back:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(231, 76, 60, 0.4);
+            background: linear-gradient(135deg, #c0392b, #a93226);
+        }
+
+        .button-group {
+            margin-top: 35px;
+            padding-top: 25px;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(46, 204, 113, 0.3);
+            transform: translateX(400px);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            font-weight: 500;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.error {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            box-shadow: 0 8px 20px rgba(231, 76, 60, 0.3);
+        }
+
+        .photo-preview {
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .photo-preview img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #3498db;
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+        }
+
+        .remove-photo-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.3s ease;
+        }
+
+        .remove-photo-btn:hover {
+            background: #c0392b;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                margin: 10px;
+            }
+            
+            .sidebar {
+                width: 100%;
+                padding: 30px 20px;
+            }
+
+            .main-content {
+                padding: 30px 20px;
+            }
+
+            .content-title {
+                font-size: 24px;
+            }
+
+            .btn-secondary, .btn-back {
+                margin-left: 0;
+                margin-top: 10px;
+            }
+        }
+
+        .tab-content {
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hidden-file-input {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="profile-image-container">
+                <div class="profile-image" id="profileAvatar" onclick="triggerFileInput()">
+                    <span id="avatarText">A</span>
+                    <div class="profile-image-overlay">
+                        📷 Ubah Foto
+                    </div>
+                </div>
+            </div>
+            <div class="profile-name" id="sidebarName">Admin</div>
+            <div class="profile-role" id="sidebarRole">Administrator</div>
+            <button class="sim-aset">SIM Aset</button>
+            
+            <div class="status-indicator">
+                <div class="status-dot"></div>
+                Online
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="content-header">
+                <h1 class="content-title">Pengaturan Profil</h1>
+            </div>
+
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('profile')">
+                    <span>📝</span> Ubah Profile
+                </button>
+                <button class="tab" onclick="switchTab('password')">
+                    <span>🔒</span> Ubah Password
+                </button>
+            </div>
+
+            <div id="profile-tab" class="tab-content">
+                <form id="profileForm">
+                    <div class="form-group">
+                        <label class="form-label">Nama User</label>
+                        <input type="text" class="form-input" value="Admin" name="nama_user" id="namaUserInput" 
+                               oninput="updateUserName(this.value)" placeholder="Masukkan nama lengkap">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-input" placeholder="admin@example.com" name="email">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Jabatan</label>
+                        <input type="text" class="form-input" value="Administrator" name="jabatan" id="jabatanInput"
+                               oninput="updateUserRole(this.value)" placeholder="Masukkan jabatan">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Unit Kerja</label>
+                        <input type="text" class="form-input" value="RIMS" name="unit_kerja" placeholder="Masukkan unit kerja">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Lokasi Kerja</label>
+                        <select class="form-select" name="lokasi_kerja">
+                            <option>Pilih Lokasi Kerja</option>
+                            <option value="Jakarta" selected>Jakarta</option>
+                            <option value="Bandung">Bandung</option>
+                            <option value="Makassar">Makassar</option>
+                            <option value="Semarang">Semarang</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Foto Profil</label>
+                        <div class="file-input-container">
+                            <input type="file" class="file-input" accept="image/*" name="foto_profil" id="fileInput" onchange="handlePhotoUpload(this)">
+                            <label class="file-input-label" id="fileLabel">
+                                📁 Pilih gambar atau seret ke sini
+                            </label>
+                        </div>
+                        <div id="photoPreview" class="photo-preview" style="display: none;">
+                            <img id="previewImg" src="" alt="Preview">
+                            <br>
+                            <button type="button" class="remove-photo-btn" onclick="removePhoto()">❌ Hapus Foto</button>
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="submit" class="btn-primary">💾 Simpan Perubahan</button>
+                        <button type="button" class="btn-secondary" onclick="resetForm()">🔄 Reset</button>
+                        <button type="button" class="btn-back" onclick="goBack()">← Kembali</button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="password-tab" class="tab-content" style="display: none;">
+                <form id="passwordForm">
+                    <div class="form-group">
+                        <label class="form-label">Password Lama</label>
+                        <input type="password" class="form-input" placeholder="Masukkan password lama" name="old_password">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Password Baru</label>
+                        <input type="password" class="form-input" placeholder="Masukkan password baru" name="new_password">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Konfirmasi Password Baru</label>
+                        <input type="password" class="form-input" placeholder="Konfirmasi password baru" name="confirm_password">
+                    </div>
+
+                    <div class="button-group">
+                        <button type="submit" class="btn-primary">🔒 Ubah Password</button>
+                        <button type="button" class="btn-secondary" onclick="resetPasswordForm()">🔄 Reset</button>
+                        <button type="button" class="btn-back" onclick="goBack()">← Kembali</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden file input for profile image click -->
+    <input type="file" id="hiddenFileInput" class="hidden-file-input" accept="image/*" onchange="handlePhotoUpload(this)">
+
+    <div id="notification" class="notification"></div>
+
+    <script>
+        let currentProfileImage = null;
+
+        function switchTab(tabName) {
+            // Hide all tab contents
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => {
+                content.style.display = 'none';
+            });
+
+            // Remove active class from all tabs
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Show selected tab content
+            if (tabName === 'profile') {
+                document.getElementById('profile-tab').style.display = 'block';
+                document.querySelector('.tab:first-child').classList.add('active');
+            } else if (tabName === 'password') {
+                document.getElementById('password-tab').style.display = 'block';
+                document.querySelector('.tab:last-child').classList.add('active');
+            }
+        }
+
+        function updateUserName(name) {
+            const sidebarName = document.getElementById('sidebarName');
+            const avatarText = document.getElementById('avatarText');
+            
+            if (name.trim()) {
+                sidebarName.textContent = name;
+                // Only update avatar text if no image is set
+                if (!currentProfileImage) {
+                    avatarText.textContent = name.charAt(0).toUpperCase();
+                }
+            } else {
+                sidebarName.textContent = 'Admin';
+                if (!currentProfileImage) {
+                    avatarText.textContent = 'A';
+                }
+            }
+        }
+
+        function updateUserRole(jabatan) {
+            const sidebarRole = document.getElementById('sidebarRole');
+            
+            if (jabatan.trim()) {
+                sidebarRole.textContent = jabatan;
+            } else {
+                sidebarRole.textContent = 'Administrator';
+            }
+        }
+
+        function triggerFileInput() {
+            document.getElementById('hiddenFileInput').click();
+        }
+
+        function handlePhotoUpload(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                showNotification('❌ Harap pilih file gambar yang valid!', true);
+                return;
+            }
+
+            // Validate file size (max 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                showNotification('❌ Ukuran file terlalu besar! Maksimal 5MB', true);
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const imageDataUrl = e.target.result;
+                updateProfileImage(imageDataUrl);
+                updateFileLabel(file.name);
+                showPhotoPreview(imageDataUrl);
+                currentProfileImage = imageDataUrl;
+                
+                // Sync both file inputs
+                if (input.id === 'hiddenFileInput') {
+                    document.getElementById('fileInput').files = input.files;
+                } else {
+                    document.getElementById('hiddenFileInput').files = input.files;
+                }
+                
+                showNotification('✅ Foto profil berhasil diupload!');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function updateProfileImage(imageSrc) {
+            const profileAvatar = document.getElementById('profileAvatar');
+            const avatarText = document.getElementById('avatarText');
+            
+            // Clear existing content
+            profileAvatar.innerHTML = '';
+            
+            // Create and add image element
+            const img = document.createElement('img');
+            img.src = imageSrc;
+            img.alt = 'Profile Image';
+            profileAvatar.appendChild(img);
+            
+            // Add overlay for hover effect
+            const overlay = document.createElement('div');
+            overlay.className = 'profile-image-overlay';
+            overlay.innerHTML = '📷 Ubah Foto';
+            profileAvatar.appendChild(overlay);
+        }
+
+        function updateFileLabel(fileName) {
+            const fileLabel = document.getElementById('fileLabel');
+            fileLabel.innerHTML = `📷 ${fileName}`;
+            fileLabel.classList.add('file-selected');
+        }
+
+        function showPhotoPreview(imageSrc) {
+            const photoPreview = document.getElementById('photoPreview');
+            const previewImg = document.getElementById('previewImg');
+            
+            previewImg.src = imageSrc;
+            photoPreview.style.display = 'block';
+        }
+
+        function removePhoto() {
+            // Reset profile image to initial state
+            const profileAvatar = document.getElementById('profileAvatar');
+            const avatarText = document.getElementById('avatarText');
+            const namaUserInput = document.getElementById('namaUserInput');
+            
+            profileAvatar.innerHTML = `
+                <span id="avatarText">${namaUserInput.value ? namaUserInput.value.charAt(0).toUpperCase() : 'A'}</span>
+                <div class="profile-image-overlay">📷 Ubah Foto</div>
+            `;
+            
+            // Reset file inputs
+            document.getElementById('fileInput').value = '';
+            document.getElementById('hiddenFileInput').value = '';
+            
+            // Reset file label
+            const fileLabel = document.getElementById('fileLabel');
+            fileLabel.innerHTML = '📁 Pilih gambar atau seret ke sini';
+            fileLabel.classList.remove('file-selected');
+            
+            // Hide preview
+            document.getElementById('photoPreview').style.display = 'none';
+            
+            // Clear current image reference
+            currentProfileImage = null;
+            
+            showNotification('✅ Foto profil berhasil dihapus!');
+        }
+
+        function resetForm() {
+            document.getElementById('profileForm').reset();
+            removePhoto();
+            // Reset nama dan jabatan di sidebar ke nilai default
+            document.getElementById('sidebarName').textContent = 'Admin';
+            document.getElementById('sidebarRole').textContent = 'Administrator';
+            document.getElementById('namaUserInput').value = 'Admin';
+            document.getElementById('jabatanInput').value = 'Administrator';
+            updateUserName('Admin');
+            updateUserRole('Administrator');
+        }
+
+        function resetPasswordForm() {
+            document.getElementById('passwordForm').reset();
+        }
+
+        function goBack() {
+            window.history.back();
+        }
+
+        function showNotification(message, isError = false) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${isError ? 'error' : ''} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Handle form submissions
+        document.getElementById('profileForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            showNotification('✅ Profil berhasil diperbarui!');
+        });
+
+        document.getElementById('passwordForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const newPassword = document.querySelector('input[name="new_password"]').value;
+            const confirmPassword = document.querySelector('input[name="confirm_password"]').value;
+            
+            if (newPassword !== confirmPassword) {
+                showNotification('❌ Password baru dan konfirmasi password tidak cocok!', true);
+                return;
+            }
+            
+            if (newPassword.length < 6) {
+                showNotification('❌ Password minimal 6 karakter!', true);
+                return;
+            }
+            
+            showNotification('✅ Password berhasil diubah!');
+            resetPasswordForm();
+        });
+
+        // Initialize dengan nama dan jabatan default
+        document.addEventListener('DOMContentLoaded', function() {
+            const namaInput = document.getElementById('namaUserInput');
+            const jabatanInput = document.getElementById('jabatanInput');
+            updateUserName(namaInput.value);
+            updateUserRole(jabatanInput.value);
+        });
+
+        // Drag and drop functionality untuk file upload
+        const fileLabel = document.getElementById('fileLabel');
+        const fileInput = document.getElementById('fileInput');
+
+        fileLabel.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            this.style.borderColor = '#3498db';
+            this.style.background = 'linear-gradient(135deg, #e3f2fd, #bbdefb)';
+        });
+
+        fileLabel.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            this.style.borderColor = '#bdc3c7';
+            this.style.background = 'linear-gradient(135deg, #f8f9fa, #e9ecef)';
+        });
+
+        fileLabel.addEventListener('drop', function(e) {
+            e.preventDefault();
+            this.style.borderColor = '#bdc3c7';
+            this.style.background = 'linear-gradient(135deg, #f8f9fa, #e9ecef)';
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                // Create a new FileList-like object
+                const dt = new DataTransfer();
+                dt.items.add(files[0]);
+                fileInput.files = dt.files;
+                handlePhotoUpload(fileInput);
+            }
+        });
+    </script>
+</body>
+</html>

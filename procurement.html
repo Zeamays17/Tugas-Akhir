@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Pemindahan Aset</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .breadcrumb {
+            opacity: 0.9;
+            font-size: 0.9em;
+        }
+
+        .controls {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,123,255,0.3);
+        }
+
+        .btn-success {
+            background: #28a745;
+        }
+
+        .btn-success:hover {
+            background: #1e7e34;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+
+        .btn-info {
+            background: #17a2b8;
+        }
+
+        .btn-info:hover {
+            background: #138496;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .show-entries {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .show-entries select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-box input {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            width: 250px;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        th, td {
+            padding: 15px 12px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .status-proses {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-selesai {
+            background: #d1edff;
+            color: #0c5460;
+        }
+
+        .status-pending {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+
+        .empty-state i {
+            font-size: 4em;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .pagination-info {
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 0;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            padding: 20px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px 10px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.5em;
+        }
+
+        .close {
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+
+        .close:hover {
+            opacity: 0.7;
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #495057;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .modal-footer {
+            padding: 20px 30px;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            font-size: 2em;
+            margin-bottom: 10px;
+            color: #007bff;
+        }
+
+        .stat-card p {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .stat-card.pending h3 { color: #dc3545; }
+        .stat-card.proses h3 { color: #ffc107; }
+        .stat-card.selesai h3 { color: #28a745; }
+
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+        }
+
+        .alert-success {
+            color: #155724;
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+
+        .alert-error {
+            color: #721c24;
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .table-container {
+                overflow-x: auto;
+            }
+            
+            .modal-content {
+                width: 95%;
+                margin: 10% auto;
+            }
+            
+            .form-row {
+                flex-direction: column;
+            }
+
+            .stats-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Pengadaan Aset</h1>
+            <div style="margin-top: 15px;">
+                <a href="asset-itdri.html" class="btn" style="background: #dc3545; color: white; border: 1px solid #dc3545;">
+                    Kembali
+                </a>
+            </div>
+        </div>
+
+        <!-- Alert Messages -->
+        <div id="alertContainer"></div>
+
+        <!-- Statistics Cards -->
+        <div class="stats-cards">
+            <div class="stat-card">
+                <h3 id="totalAssets">0</h3>
+                <p>Total Pemindahan</p>
+            </div>
+            <div class="stat-card pending">
+                <h3 id="pendingAssets">0</h3>
+                <p>Menunggu Persetujuan</p>
+            </div>
+            <div class="stat-card proses">
+                <h3 id="prosesAssets">0</h3>
+                <p>Dalam Proses</p>
+            </div>
+            <div class="stat-card selesai">
+                <h3 id="selesaiAssets">0</h3>
+                <p>Selesai</p>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="show-entries">
+                <span>Tampilkan</span>
+                <select id="entriesPerPage" onchange="changeEntriesPerPage()">
+                    <option value="5">5</option>
+                    <option value="10" selected>10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                </select>
+                <span>entri</span>
+            </div>
+            
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Cari kode aset, nama, atau lokasi..." oninput="searchData()" />
+                    <button class="btn" onclick="clearSearch()">Clear</button>
+                </div>
+                <button class="btn btn-success" onclick="openAddModal()">+ Tambah Pemindahan</button>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table id="transferTable">
+                <thead>
+                    <tr>
+                        <th>No.</th>
+                        <th>Kode Aset</th>
+                        <th>Nama Aset</th>
+                        <th>Kategori</th>
+                        <th>Lokasi Asal</th>
+                        <th>Lokasi Tujuan</th>
+                        <th>Penanggung Jawab</th>
+                        <th>Tanggal Pemindahan</th>
+                        <th>Status</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                </tbody>
+            </table>
+            
+            <div id="emptyState" class="empty-state" style="display: none;">
+                <div style="font-size: 4em; margin-bottom: 20px; opacity: 0.5;">📦</div>
+                <h3>Belum ada data pemindahan aset</h3>
+                <p>Klik tombol "Tambah Pemindahan" untuk menambahkan pemindahan aset baru.</p>
+            </div>
+
+            <div class="pagination">
+                <div class="pagination-info" id="paginationInfo">
+                    Menampilkan 0 dari 0 entri
+                </div>
+                <div class="pagination-controls">
+                    <button class="btn btn-secondary" id="prevBtn" onclick="changePage(-1)" disabled>Sebelumnya</button>
+                    <button class="btn btn-secondary" id="nextBtn" onclick="changePage(1)" disabled>Berikutnya</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Form -->
+    <div id="transferModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Tambah Pemindahan Aset</h2>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="transferForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="kodeAset">Kode Aset *</label>
+                            <input type="text" id="kodeAset" required placeholder="Masukkan kode aset">
+                        </div>
+                        <div class="form-group">
+                            <label for="namaAset">Nama Aset *</label>
+                            <input type="text" id="namaAset" required placeholder="Masukkan nama aset">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="kategori">Kategori Aset *</label>
+                            <select id="kategori" required>
+                                <option value="">Pilih Kategori</option>
+                                <option value="Komputer & IT">Komputer & IT</option>
+                                <option value="Furniture">Furniture</option>
+                                <option value="Kendaraan">Kendaraan</option>
+                                <option value="Elektronik">Elektronik</option>
+                                <option value="Peralatan Kantor">Peralatan Kantor</option>
+                                <option value="Lainnya">Lainnya</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="kondisi">Kondisi Aset</label>
+                            <select id="kondisi">
+                                <option value="Baik">Baik</option>
+                                <option value="Rusak Ringan">Rusak Ringan</option>
+                                <option value="Rusak Berat">Rusak Berat</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="lokasiAsal">Lokasi Asal *</label>
+                            <select id="lokasiAsal" required>
+                                <option value="">Pilih Lokasi Asal</option>
+                                <option value="Jakarta Pusat">Jakarta Pusat</option>
+                                <option value="Jakarta Selatan">Jakarta Selatan</option>
+                                <option value="Bandung">Bandung</option>
+                                <option value="Surabaya">Surabaya</option>
+                                <option value="Semarang">Semarang</option>
+                                <option value="Medan">Medan</option>
+                                <option value="Makassar">Makassar</option>
+                                <option value="Denpasar">Denpasar</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="lokasiTujuan">Lokasi Tujuan *</label>
+                            <select id="lokasiTujuan" required>
+                                <option value="">Pilih Lokasi Tujuan</option>
+                                <option value="Jakarta Pusat">Jakarta Pusat</option>
+                                <option value="Jakarta Selatan">Jakarta Selatan</option>
+                                <option value="Bandung">Bandung</option>
+                                <option value="Surabaya">Surabaya</option>
+                                <option value="Semarang">Semarang</option>
+                                <option value="Medan">Medan</option>
+                                <option value="Makassar">Makassar</option>
+                                <option value="Denpasar">Denpasar</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="penanggungJawab">Penanggung Jawab *</label>
+                            <input type="text" id="penanggungJawab" required placeholder="Nama penanggung jawab">
+                        </div>
+                        <div class="form-group">
+                            <label for="tanggalPemindahan">Tanggal Pemindahan *</label>
+                            <input type="date" id="tanggalPemindahan" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="alasanPemindahan">Alasan Pemindahan *</label>
+                            <textarea id="alasanPemindahan" required placeholder="Jelaskan alasan pemindahan aset ini..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="status">Status</label>
+                            <select id="status" required>
+                                <option value="Pending">Pending</option>
+                                <option value="Proses">Proses</option>
+                                <option value="Selesai">Selesai</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="keterangan">Keterangan Tambahan</label>
+                        <textarea id="keterangan" placeholder="Keterangan tambahan (opsional)"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal()">Batal</button>
+                <button type="button" class="btn btn-success" onclick="saveData()">Simpan Data</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detail Modal -->
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Detail Pemindahan Aset</h2>
+                <span class="close" onclick="closeDetailModal()">&times;</span>
+            </div>
+            <div class="modal-body" id="detailContent">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeDetailModal()">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let transferData = [];
+        let filteredData = [];
+        let currentPage = 1;
+        let entriesPerPage = 10;
+        let editingIndex = -1;
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            initSampleData();
+            
+            // Add event listeners
+            document.getElementById('entriesPerPage').addEventListener('change', changeEntriesPerPage);
+            document.getElementById('searchInput').addEventListener('input', searchData);
+            
+            // Close modal when clicking outside
+            window.addEventListener('click', function(event) {
+                const transferModal = document.getElementById('transferModal');
+                const detailModal = document.getElementById('detailModal');
+                
+                if (event.target === transferModal) {
+                    closeModal();
+                }
+                if (event.target === detailModal) {
+                    closeDetailModal();
+                }
+            });
+        });
+
+        // Sample data untuk demo
+        function initSampleData() {
+            transferData = [
+                {
+                    kodeAset: "AST-2025-001",
+                    namaAset: "Laptop Dell Inspiron 15",
+                    kategori: "Komputer & IT",
+                    kondisi: "Baik",
+                    lokasiAsal: "Jakarta Pusat",
+                    lokasiTujuan: "Bandung",
+                    penanggungJawab: "Ahmad Rizki",
+                    tanggalPemindahan: "2025-01-15",
+                    alasanPemindahan: "Reorganisasi departemen IT",
+                    status: "Selesai",
+                    keterangan: "Sudah dikemas dengan bubble wrap"
+                },
+                {
+                    kodeAset: "AST-2025-002",
+                    namaAset: "Proyektor Epson EB-X41",
+                    kategori: "Elektronik",
+                    kondisi: "Baik",
+                    lokasiAsal: "Surabaya",
+                    lokasiTujuan: "Semarang",
+                    penanggungJawab: "Siti Nurhaliza",
+                    tanggalPemindahan: "2025-01-20",
+                    alasanPemindahan: "Kebutuhan presentasi kantor cabang",
+                    status: "Proses",
+                    keterangan: "Dilengkapi dengan kabel dan remote"
+                },
+                {
+                    kodeAset: "AST-2025-003",
+                    namaAset: "Meja Kerja Executive",
+                    kategori: "Furniture",
+                    kondisi: "Baik",
+                    lokasiAsal: "Jakarta Selatan",
+                    lokasiTujuan: "Medan",
+                    penanggungJawab: "Budi Santoso",
+                    tanggalPemindahan: "2025-01-25",
+                    alasanPemindahan: "Pembukaan kantor cabang baru",
+                    status: "Pending",
+                    keterangan: "Perlu dibongkar untuk pengiriman"
+                },
+                {
+                    kodeAset: "AST-2025-004",
+                    namaAset: "Printer HP LaserJet Pro",
+                    kategori: "Peralatan Kantor",
+                    kondisi: "Baik",
+                    lokasiAsal: "Bandung",
+                    lokasiTujuan: "Makassar",
+                    penanggungJawab: "Dewi Lestari",
+                    tanggalPemindahan: "2025-01-30",
+                    alasanPemindahan: "Penggantian unit lama",
+                    status: "Selesai",
+                    keterangan: "Sudah dites dan berfungsi normal"
+                },
+                {
+                    kodeAset: "AST-2025-005",
+                    namaAset: "Kamera DSLR Canon EOS 70D",
+                    kategori: "Elektronik",
+                    kondisi: "Baik",
+                    lokasiAsal: "Denpasar",
+                    lokasiTujuan: "Jakarta Pusat",
+                    penanggungJawab: "Raka Pratama",
+                    tanggalPemindahan: "2025-02-05",
+                    alasanPemindahan: "Kebutuhan dokumentasi event",
+                    status: "Proses",
+                    keterangan: "Lengkap dengan lensa dan tripod"
+                }
+            ];
+            filteredData = [...transferData];
+            renderTable();
+            updateStats();
+        }
+
+        function updateStats() {
+            const total = transferData.length;
+            const pending = transferData.filter(item => item.status === 'Pending').length;
+            const proses = transferData.filter(item => item.status === 'Proses').length;
+            const selesai = transferData.filter(item => item.status === 'Selesai').length;
+
+            document.getElementById('totalAssets').textContent = total;
+            document.getElementById('pendingAssets').textContent = pending;
+            document.getElementById('prosesAssets').textContent = proses;
+            document.getElementById('selesaiAssets').textContent = selesai;
+        }
+
+        function renderTable() {
+            const tableBody = document.getElementById('tableBody');
+            const emptyState = document.getElementById('emptyState');
+            
+            if (filteredData.length === 0) {
+                tableBody.innerHTML = '';
+                emptyState.style.display = 'block';
+                updatePaginationInfo();
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            
+            const startIndex = (currentPage - 1) * entriesPerPage;
+            const endIndex = Math.min(startIndex + entriesPerPage, filteredData.length);
+            const currentData = filteredData.slice(startIndex, endIndex);
+            
+            tableBody.innerHTML = currentData.map((item, index) => `
+                <tr>
+                    <td>${startIndex + index + 1}</td>
+                    <td><strong>${item.kodeAset}</strong></td>
+                    <td>${item.namaAset}</td>
+                    <td>${item.kategori}</td>
+                    <td>${item.lokasiAsal}</td>
+                    <td>${item.lokasiTujuan}</td>
+                    <td>${item.penanggungJawab}</td>
+                    <td>${formatDate(item.tanggalPemindahan)}</td>
+                    <td><span class="status status-${item.status.toLowerCase()}">${item.status}</span></td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn btn-info btn-sm" onclick="viewDetail(${transferData.indexOf(item)})" title="Lihat Detail">
+                                👁️
+                            </button>
+                            <button class="btn btn-warning btn-sm" onclick="editData(${transferData.indexOf(item)})" title="Edit">
+                                ✏️
+                            </button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteData(${transferData.indexOf(item)})" title="Hapus">
+                                🗑️
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+            
+            updatePaginationInfo();
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('id-ID', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+        }
+
+        function updatePaginationInfo() {
+            const info = document.getElementById('paginationInfo');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            const startIndex = filteredData.length === 0 ? 0 : (currentPage - 1) * entriesPerPage + 1;
+            const endIndex = Math.min(currentPage * entriesPerPage, filteredData.length);
+            
+            info.textContent = `Menampilkan ${startIndex} sampai ${endIndex} dari ${filteredData.length} entri`;
+            
+            prevBtn.disabled = currentPage === 1;
+            nextBtn.disabled = currentPage * entriesPerPage >= filteredData.length;
+        }
+
+        function changePage(direction) {
+            const totalPages = Math.ceil(filteredData.length / entriesPerPage);
+            const newPage = currentPage + direction;
+            
+            if (newPage >= 1 && newPage <= totalPages) {
+                currentPage = newPage;
+                renderTable();
+            }
+        }
+
+        function changeEntriesPerPage() {
+            entriesPerPage = parseInt(document.getElementById('entriesPerPage').value);
+            currentPage = 1;
+            renderTable();
+        }
+
+        function searchData() {
+            const searchTerm = document.getElementById('searchInput')
+        }

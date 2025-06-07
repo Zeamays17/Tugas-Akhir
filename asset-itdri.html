@@ -1,0 +1,1451 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sistem Informasi Manajemen Aset">
+    <title>Sistem Informasi Manajemen Aset</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Animate.css -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <!-- AOS - Animate On Scroll -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --success-color: #4cc9f0;
+            --danger-color: #f72585;
+            --warning-color: #f8961e;
+            --info-color: #4895ef;
+            --sidebar-width: 280px;
+            --sidebar-min-width: 70px;
+            --header-height: 70px;
+            --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --transition-speed: 0.3s;
+        }
+
+        body {
+            font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Scrollbar styles */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #d1d1d1;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #b3b3b3;
+        }
+
+        /* Sidebar styles */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: var(--sidebar-width);
+            background: linear-gradient(-45deg, #7c3aed, #6d28d9, #1a1a2e, #3b0764);
+            background-size: 400% 400%;
+            animation: gradientAnimation 10s ease infinite;
+            box-shadow: var(--card-shadow);
+            overflow-y: auto;
+            transition: width var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1), transform var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+            color: white;
+            padding-bottom: 20px;
+            z-index: 1050;
+        }
+
+        .sidebar.minimized {
+            width: var(--sidebar-min-width);
+        }
+
+        .sidebar.collapsed-mobile {
+            transform: translateX(-100%);
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            position: relative;
+            transition: all var(--transition-speed) ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sidebar.minimized .sidebar-header {
+            font-size: 0;
+            padding: 15px 0;
+        }
+
+        .sidebar-header .sidebar-title {
+            display: block;
+            transition: opacity var(--transition-speed) ease;
+        }
+
+        .sidebar.minimized .sidebar-header .sidebar-title {
+            opacity: 0;
+        }
+
+        .sidebar-header .sidebar-logo {
+            width: 70px;
+            height: 50px;
+            margin-right: 5px;
+            transition: opacity var(--transition-speed) ease;
+        }
+
+        .sidebar.minimized .sidebar-header .sidebar-logo {
+            opacity: 0;
+            width: 0;
+            margin-right: 0;
+        }
+
+        .sidebar-toggle {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+            z-index: 1;
+        }
+
+        .sidebar-toggle:hover {
+            color: white;
+            transform: rotate(90deg);
+        }
+
+        .sidebar-menu {
+            padding: 0;
+            list-style: none;
+            margin: 0;
+        }
+
+        .sidebar-menu li {
+            padding: 0;
+            margin: 5px 10px;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .sidebar-menu li a {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all var(--transition-speed) ease;
+            border-radius: 8px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Removed white hover animation */
+        .sidebar-menu li a:hover {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .sidebar-menu li a.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transform: translateX(0);
+        }
+
+        .sidebar-menu li a span {
+            transition: opacity var(--transition-speed) ease;
+            white-space: nowrap;
+        }
+
+        .sidebar.minimized .sidebar-menu li a span {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+        }
+
+        .sidebar-menu li a i {
+            margin-right: 15px;
+            width: 20px;
+            text-align: center;
+            font-size: 1.2rem;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .sidebar.minimized .sidebar-menu li a i {
+            margin-right: 0;
+        }
+
+        .sidebar-menu li a:hover i {
+            transform: scale(1.1);
+        }
+
+        .dropdown-toggle::after {
+            margin-left: auto;
+            border-top: .3em solid rgba(255, 255, 255, 0.8);
+            transition: transform var(--transition-speed) ease;
+        }
+
+        .dropdown-toggle[aria-expanded="true"]::after {
+            transform: rotate(180deg);
+        }
+
+        .dropdown-menu {
+            position: static !important;
+            transform: none !important;
+            width: 100%;
+            padding: 0;
+            margin: 0;
+            border: none;
+            background-color: rgba(0, 0, 0, 0.1);
+            box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.1);
+            border-radius: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height var(--transition-speed) ease;
+        }
+
+        .dropdown-menu.show {
+            max-height: 300px;
+        }
+
+        .dropdown-item {
+            padding: 12px 20px 12px 55px !important;
+            color: rgba(255, 255, 255, 0.7) !important;
+            transition: all var(--transition-speed) ease;
+            position: relative;
+        }
+
+        .dropdown-item:hover {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+            color: white !important;
+            transform: translateX(5px);
+        }
+
+        .dropdown-item:before {
+            content: '';
+            position: absolute;
+            left: 40px;
+            top: 50%;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-50%);
+            transition: all var(--transition-speed) ease;
+        }
+
+        .dropdown-item:hover:before {
+            background-color: white;
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+        }
+
+        /* Main content styles */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 20px 30px;
+            min-height: 100vh;
+            transition: margin-left var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .sidebar.minimized + .main-content {
+            margin-left: var(--sidebar-min-width);
+        }
+
+        .sidebar.collapsed-mobile + .main-content {
+            margin-left: 0;
+        }
+
+        /* Header styles */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: var(--header-height);
+            padding: 0 25px;
+            background-color: #ffffff;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 25px;
+            border-radius: 12px;
+            z-index: 1000;
+        }
+
+        .menu-toggle {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--primary-color);
+            transition: all var(--transition-speed) ease;
+            display: none;
+        }
+
+        .menu-toggle:hover {
+            transform: rotate(90deg);
+        }
+
+        .breadcrumb-wrapper {
+            display: flex;
+            align-items: center;
+        }
+
+        .breadcrumb {
+            margin-bottom: 0;
+        }
+
+        .breadcrumb-item a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .breadcrumb-item a:hover {
+            color: var(--secondary-color);
+        }
+
+        .breadcrumb-item.active {
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+
+        .user-profile span {
+            margin-right: 15px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .user-profile img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary-color);
+            transition: all var(--transition-speed) ease;
+            cursor: pointer;
+        }
+
+        .user-profile img:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.3);
+        }
+
+        /* Welcome banner */
+        .welcome-banner {
+            background: linear-gradient(135deg, var(--info-color) 0%, var(--primary-color) 100%);
+            color: #ffffff;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            animation: fadeInDown 1s;
+        }
+
+        .welcome-banner h3 {
+            margin-bottom: 10px;
+            font-weight: 700;
+            font-size: 1.8rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .welcome-banner p {
+            margin-bottom: 0;
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .welcome-banner:after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200px;
+            height: 200px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            z-index: 1;
+        }
+
+        .welcome-banner:before {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -10%;
+            width: 150px;
+            height: 150px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            z-index: 1;
+        }
+
+        /* Dashboard cards */
+        .dashboard-card {
+            position: relative;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            color: #ffffff;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            transition: all var(--transition-speed) ease;
+            z-index: 1;
+            min-height: 180px;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .dashboard-card.primary {
+            background: linear-gradient(135deg, #3a0ca3 0%, #4361ee 100%);
+        }
+
+        .dashboard-card.info {
+            background: linear-gradient(135deg, #4895ef 0%, #4cc9f0 100%);
+        }
+
+        .dashboard-card.success {
+            background: linear-gradient(135deg, #0077b6 0%, #00b4d8 100%);
+        }
+
+        .dashboard-card:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 60%);
+            z-index: -1;
+        }
+
+        .dashboard-card .card-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            line-height: 1;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 0.5s;
+        }
+
+        .dashboard-card .card-title {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+
+        .dashboard-card .card-icon {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            font-size: 2.5rem;
+            opacity: 0.3;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .dashboard-card:hover .card-icon {
+            transform: scale(1.2) rotate(15deg);
+            opacity: 0.4;
+        }
+
+        .dashboard-card .card-link {
+            display: inline-block;
+            color: #ffffff;
+            text-decoration: none;
+            margin-top: 15px;
+            font-weight: 500;
+            position: relative;
+            padding-right: 25px;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .dashboard-card .card-link i {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            transition: all var(--transition-speed) ease;
+        }
+
+        .dashboard-card .card-link:hover {
+            padding-right: 30px;
+        }
+
+        .dashboard-card .card-link:hover i {
+            right: -5px;
+        }
+
+        /* Chart containers */
+        .chart-container {
+            background-color: #ffffff;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: var(--card-shadow);
+            transition: all var(--transition-speed) ease;
+            overflow: hidden;
+        }
+
+        .chart-container:hover {
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eaeaea;
+        }
+
+        .chart-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .chart-actions button {
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            margin-left: 8px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .chart-actions button:hover {
+            background-color: #f8f9fa;
+            color: var(--primary-color);
+            transform: rotate(15deg);
+        }
+
+        /* Location section */
+        .location-section {
+            background-color: #ffffff;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: var(--card-shadow);
+            transition: all var(--transition-speed) ease;
+        }
+
+        .location-section:hover {
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .location-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .location-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .location-actions a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .location-actions a:hover {
+            color: var(--secondary-color);
+        }
+
+        .location-map {
+            height: 300px;
+            border-radius: 10px;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 2000;
+        }
+
+        .toast {
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            animation: slideInRight 0.3s ease forwards;
+        }
+
+        .toast-header {
+            background-color: #f8f9fa;
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .toast-body {
+            padding: 1rem;
+            background-color: white;
+        }
+
+        /* Footer styles */
+        .footer {
+            margin-top: auto;
+            background-color: #ffffff;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            border-top: 1px solid #eaeaea;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: color var(--transition-speed) ease;
+        }
+
+        .footer a:hover {
+            color: var(--secondary-color);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translate3d(0, 40px, 0);
+            }
+            to {
+                opacity: 1;
+                transform: translate3d(0, 0, 0);
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translate3d(0, -40px, 0);
+            }
+            to {
+                opacity: 1;
+                transform: translate3d(0, 0, 0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translate3d(100%, 0, 0);
+                opacity: 0;
+            }
+            to {
+                transform: translate3d(0, 0, 0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes gradientAnimation {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* Responsive styles */
+        @media (max-width: 992px) {
+            .sidebar {
+                width: var(--sidebar-min-width);
+            }
+
+            .sidebar.expanded {
+                width: var(--sidebar-width);
+            }
+
+            .sidebar-header .sidebar-title {
+                display: none;
+            }
+
+            .sidebar.expanded .sidebar-header .sidebar-title {
+                display: block;
+            }
+
+            .sidebar-menu li a span {
+                display: none;
+            }
+
+            .sidebar.expanded .sidebar-menu li a span {
+                display: inline;
+            }
+
+            .sidebar-menu li a {
+                justify-content: center;
+                padding: 15px 0;
+            }
+
+            .sidebar.expanded .sidebar-menu li a {
+                justify-content: flex-start;
+                padding: 15px 20px;
+            }
+
+            .sidebar-menu li a i {
+                margin-right: 0;
+                font-size: 1.5rem;
+            }
+
+            .sidebar.expanded .sidebar-menu li a i {
+                margin-right: 15px;
+                font-size: 1.2rem;
+            }
+
+            .dropdown-menu {
+                display: none;
+            }
+
+            .sidebar.expanded .dropdown-menu {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: var(--sidebar-min-width);
+            }
+
+            .sidebar.expanded + .main-content {
+                margin-left: var(--sidebar-width);
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: var(--sidebar-width);
+                transform: translateX(-100%);
+            }
+
+            .sidebar.expanded {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .dashboard-card {
+                margin-bottom: 20px;
+            }
+
+            .header {
+                border-radius: 8px;
+                padding: 0 15px;
+            }
+
+            .user-profile span {
+                display: none;
+            }
+
+            .location-section {
+                padding: 20px;
+            }
+
+            .location-map {
+                height: 250px;
+            }
+
+            .footer {
+                padding: 30px;
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <img src="TCU1.png" alt="Logo" class="sidebar-logo">
+            <span class="sidebar-title">Inventory</span>
+            <button class="sidebar-toggle" aria-label="Toggle sidebar">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        <ul class="sidebar-menu">
+            <li>
+                <a href="#" class="active" aria-current="page">
+                    <i class="fas fa-tachometer-alt"></i> <span>Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class="fas fa-database"></i> <span>Data Aset</span>
+                </a>
+            </li>
+            <li>
+                <a href="#layanan" class="dropdown-toggle" data-bs-toggle="collapse" aria-expanded="false">
+                    <i class="fas fa-hand-holding"></i> <span>Layanan</span>
+                </a>
+                <ul class="dropdown-menu collapse" id="layanan">
+                    <li><a class="dropdown-item" href="loan.html">Peminjaman Aset</a></li>
+                    <li><a class="dropdown-item" href="transfer.html">Pemindahan Aset</a></li>
+                    <li><a class="dropdown-item" href="#">Pengadaan Aset</a></li>
+                    <li><a class="dropdown-item" href="#">Maintenance Aset</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="#">
+                    <i class="fas fa-chart-line"></i> <span>Activity Report</span>
+                </a>
+            </li>
+            <li>
+                <a href="#pengaturan" class="dropdown-toggle" data-bs-toggle="collapse" aria-expanded="false">
+                    <i class="fas fa-cog"></i> <span>Pengaturan</span>
+                </a>
+                <ul class="dropdown-menu collapse" id="pengaturan">
+                    <li><a class="dropdown-item" href="#">User Settings</a></li>
+                    <li><a class="dropdown-item" href="#">System Settings</a></li>
+                </ul>
+            </li>
+            <li>
+            <a href="login.html">
+                <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
+            </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <div class="header animate__animated animate__fadeInDown">
+            <div class="breadcrumb-wrapper">
+                <button class="menu-toggle" aria-label="Toggle sidebar">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
+                        
+                    </ol>
+                </nav>
+            </div>
+            <div class="user-profile" id="userProfileLink">
+            <span>Hi, Admin User</span>
+            <img src="https://via.placeholder.com/40" alt="User Profile">
+            </div>
+        </div>
+
+        <!-- Dashboard Content -->
+        <div class="welcome-banner" data-aos="fade-down">
+            <h3><i class="fas fa-hand-wave"></i> <span class="greeting">Selamat Sore</span></h3>
+            <p>Selamat Datang di Website Inventaris Manajemen Aset</p>
+        </div>
+
+        <!-- Dashboard Cards -->
+        <div class="row">
+            <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="dashboard-card primary">
+                    <div class="card-icon">
+                        <i class="fas fa-box"></i>
+                    </div>
+                    <div class="card-value" id="totalAset">0</div>
+                    <div class="card-title">Total Aset</div>
+                    <a href="#" class="card-link">Selengkapnya <i class="fas fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="dashboard-card info">
+                    <div class="card-icon">
+                        <i class="fas fa-handshake"></i>
+                    </div>
+                    <div class="card-value" id="barangDipinjam">0</div>
+                    <div class="card-title">Barang Dipinjam</div>
+                    <a href="#" class="card-link">Selengkapnya <i class="fas fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="300">
+                <div class="dashboard-card success">
+                    <div class="card-icon">
+                        <i class="fas fa-tools"></i>
+                    </div>
+                    <div class="card-value" id="barangDipinjam">0</div>
+                    <div class="card-title">Barang Dipinjam</div>
+                    <a href="{{ route('loans') }}" class="card-link">Selengkapnya <i class="fas fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="300">
+                <div class="dashboard-card success">
+                    <div class="card-icon">
+                        <i class="fas fa-tools"></i>
+                    </div>
+                    <div class="card-value" id="asetMaintenance">0</div>
+                    <div class="card-title">Aset Maintenance</div>
+                    <a href="{{ route('maintenances') }}" class="card-link">Selengkapnya <i class="fas fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="row">
+            <div class="col-md-6 mb-4" data-aos="fade-up" data-aos-delay="400">
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <div class="chart-title">
+                            <i class="fas fa-chart-pie me-2"></i> Kondisi Aset
+                        </div>
+                        <div class="chart-actions">
+                            <button aria-label="Refresh chart"><i class="fas fa-sync-alt"></i></button>
+                            <button aria-label="Toggle fullscreen"><i class="fas fa-expand"></i></button>
+                        </div>
+                    </div>
+                    <div>
+                        <canvas id="kondisiAsetChart" height="300" aria-label="Pie chart showing asset conditions"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4" data-aos="fade-up" data-aos-delay="500">
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <div class="chart-title">
+                            <i class="fas fa-chart-bar me-2"></i> Jenis Aset
+                        </div>
+                        <div class="chart-actions">
+                            <button aria-label="Refresh chart"><i class="fas fa-sync-alt"></i></button>
+                            <button aria-label="Toggle fullscreen"><i class="fas fa-expand"></i></button>
+                        </div>
+                    </div>
+                    <div>
+                        <canvas id="jenisAsetChart" height="300" aria-label="Bar chart showing asset types"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Location Section -->
+        <div class="location-section" data-aos="fade-up" data-aos-delay="600">
+            <div class="location-header">
+                <div class="location-title">
+                    <i class="fas fa-map-marker-alt me-2"></i> Lokasi Kami
+                </div>
+                <div class="location-actions">
+                    <a href="https://www.google.com/maps" target="_blank">Lihat di Google Maps</a>
+                </div>
+            </div>
+            <div class="location-map">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d247.57196926346842!2d107.58985038523512!3d-6.8724430079614205!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sid!2sid!4v1747643424525!5m2!1sid!2sid" width="100%" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>© 2025 Sistem Informasi Manajemen Aset. All rights reserved.</p>
+            <p>Dibuat oleh <a href="#">Tim Pengembang SIMA</a> | <a href="#">Kebijakan Privasi</a> | <a href="#">Syarat & Ketentuan</a></p>
+        </footer>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container">
+        <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="3000">
+            <div class="toast-header">
+                <strong class="me-auto"><i class="fas fa-bell me-2"></i> Notifikasi</strong>
+                <small>Baru saja</small>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                Selamat datang kembali! Data aset telah diperbarui.
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS with Popper -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
+    <!-- AOS - Animate On Scroll -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <!-- CountUp.js (Using CDN instead of local file for reliability) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/countup.js/2.0.8/countUp.min.js"></script>
+    <script>
+    // Global error handler to catch script errors
+    window.onerror = function(message, source, lineno, colno, error) {
+        console.error('Script Error Details:', {
+            message: message,
+            source: source,
+            line: lineno,
+            column: colno,
+            error: error
+        });
+        return true; // Prevent default error handling
+    };
+
+    // Initialize AOS
+    AOS.init({
+        duration: 1000,
+        once: true,
+        mirror: false
+    });
+
+    // Helper function to initialize CountUp
+    function initCountUp(elementId, endValue, duration) {
+        const element = document.getElementById(elementId);
+        if (!element) {
+            console.warn(`Element with ID ${elementId} not found. Skipping CountUp initialization.`);
+            return;
+        }
+        if (typeof CountUp === 'undefined') {
+            console.error('CountUp is not defined. Ensure CountUp.js is loaded correctly.');
+            return;
+        }
+        try {
+            const countUp = new CountUp(elementId, 0, endValue, 0, duration, {
+                useEasing: true,
+                useGrouping: true,
+                separator: ',',
+                decimal: '.'
+            });
+            if (!countUp.error) {
+                countUp.start();
+            } else {
+                console.error(`CountUp error for ${elementId}:`, countUp.error);
+            }
+        } catch (err) {
+            console.error(`Error initializing CountUp for ${elementId}:`, err);
+        }
+    }
+
+    // Helper function to initialize Chart
+    function initChart(canvasId, config) {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) {
+            console.warn(`Canvas with ID ${canvasId} not found.`);
+            return null;
+        }
+        if (typeof Chart === 'undefined') {
+            console.error('Chart.js is not defined. Ensure Chart.js is loaded correctly.');
+            return null;
+        }
+        try {
+            return new Chart(canvas.getContext('2d'), config);
+        } catch (err) {
+            console.error(`Error initializing Chart for ${canvasId}:`, err);
+            return null;
+        }
+    }
+
+    // Fetch data functions
+    async function fetchDashboardStats() {
+        const fallback = { totalAset: 9411, barangDipinjam: 0, asetMaintenance: 0 };
+        try {
+            const response = await fetch('{{ route("dashboard.stats") }}', {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                }
+            });
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            const result = await response.json();
+            if (result.success) {
+                return result.data;
+            } else {
+                console.error('Stats API error:', result.error);
+                return fallback;
+            }
+        } catch (error) {
+            console.error('Fetch stats error:', error);
+            return fallback;
+        }
+    }
+
+    async function fetchAssetConditions() {
+        const fallback = {
+            labels: ['Baik', 'Rusak Ringan', 'Rusak Berat'],
+            data: [8500, 650, 261]
+        };
+        try {
+            const response = await fetch('{{ route("dashboard.asset_conditions") }}', {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                }
+            });
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            const result = await response.json();
+            const data = result.success ? result.data : fallback;
+            return {
+                type: 'pie',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: 'Kondisi Aset',
+                        data: data.data,
+                        backgroundColor: ['#4CC9F0', '#F8961E', '#F72585'],
+                        borderColor: ['#ffffff', '#ffffff', '#ffffff'],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { padding: 20, usePointStyle: true, pointStyle: 'circle' } },
+                        tooltip: {
+                            callbacks: {
+                                label: context => {
+                                    const total = context.dataset.data.reduce((acc, data) => acc + data, 0);
+                                    const percentage = Math.round((context.parsed / total) * 100);
+                                    return `${context.label}: ${context.parsed} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+        } catch (error) {
+            console.error('Fetch asset conditions error:', error);
+            return {
+                type: 'pie',
+                data: {
+                    labels: fallback.labels,
+                    datasets: [{
+                        label: 'Kondisi Aset',
+                        data: fallback.data,
+                        backgroundColor: ['#4CC9F0', '#F8961E', '#F72585'],
+                        borderColor: ['#ffffff', '#ffffff', '#ffffff'],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { padding: 20, usePointStyle: true, pointStyle: 'circle' } },
+                        tooltip: {
+                            callbacks: {
+                                label: context => {
+                                    const total = context.dataset.data.reduce((acc, data) => acc + data, 0);
+                                    const percentage = Math.round((context.parsed / total) * 100);
+                                    return `${context.label}: ${context.parsed} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+        }
+    }
+
+    async function fetchAssetTypes() {
+        const fallback = {
+            labels: ['Komputer', 'Laptop', 'LED Monitor', 'Printer', 'Electrolux', 'Furniture'],
+            data: [3452, 1978, 1240, 980, 1180, 581]
+        };
+        try {
+            const response = await fetch('{{ route("dashboard.asset_types") }}', {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                }
+            });
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            const result = await response.json();
+            const data = result.success ? result.data : fallback;
+            return {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: 'Jumlah Aset',
+                        data: data.data,
+                        backgroundColor: [
+                            'rgba(67, 97, 238, 0.7)', 'rgba(72, 149, 239, 0.7)',
+                            'rgba(76, 201, 240, 0.7)', 'rgba(0, 180, 216, 0.7)',
+                            'rgba(0, 119, 182, 0.7)', 'rgba(58, 12, 163, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(67, 97, 238, 1)', 'rgba(72, 149, 239, 1)',
+                            'rgba(76, 201, 240, 1)', 'rgba(0, 180, 216, 1)',
+                            'rgba(0, 119, 182, 1)', 'rgba(58, 12, 163, 1)'
+                        ],
+                        borderWidth: 1,
+                        borderRadius: 5,
+                        maxBarThickness: 50
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false, callbacks: { label: context => `Jumlah: ${context.parsed.y} unit` } } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { drawBorder: false, color: 'rgba(0, 0, 0, 0.05)' }, ticks: { font: { size: 12 } } },
+                        x: { grid: { display: false }, ticks: { font: { size: 12 } } }
+                    }
+                }
+            };
+        } catch (error) {
+            console.error('Fetch asset types error:', error);
+            return {
+                type: 'bar',
+                data: {
+                    labels: fallback.labels,
+                    datasets: [{
+                        label: 'Jumlah Aset',
+                        data: fallback.data,
+                        backgroundColor: [
+                            'rgba(67, 97, 238, 0.7)', 'rgba(72, 149, 239, 0.7)',
+                            'rgba(76, 201, 240, 0.7)', 'rgba(0, 180, 216, 0.7)',
+                            'rgba(0, 119, 182, 0.7)', 'rgba(58, 12, 163, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(67, 97, 238, 1)', 'rgba(72, 149, 239, 1)',
+                            'rgba(76, 201, 240, 1)', 'rgba(0, 180, 216, 1)',
+                            'rgba(0, 119, 182, 1)', 'rgba(58, 12, 163, 1)'
+                        ],
+                        borderWidth: 1,
+                        borderRadius: 5,
+                        maxBarThickness: 50
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false, callbacks: { label: context => `Jumlah: ${context.parsed.y} unit` } } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { drawBorder: false, color: 'rgba(0, 0, 0, 0.05)' }, ticks: { font: { size: 12 } } },
+                        x: { grid: { display: false }, ticks: { font: { size: 12 } } }
+                    }
+                }
+            };
+        }
+    }
+
+    // Function to initialize counters with dynamic data
+    async function initializeCounters() {
+        const stats = await fetchDashboardStats();
+        const counters = [
+            { id: 'totalAset', value: stats.totalAset, duration: 2.5 },
+            { id: 'barangDipinjam', value: stats.barangDipinjam, duration: 2.5 },
+            { id: 'asetMaintenance', value: stats.asetMaintenance, duration: 2.5 }
+        ];
+        counters.forEach(counter => initCountUp(counter.id, counter.value, counter.duration));
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        // Initialize Toasts
+        const toastEl = document.querySelector('.toast');
+        if (toastEl) {
+            const toast = new bootstrap.Toast(toastEl);
+            setTimeout(() => toast.show(), 1500);
+        }
+
+        // Dynamic greeting (04:40 PM WIB on May 22, 2025)
+        const now = new Date();
+        const hour = now.getHours(); // Get current hour (16 for 04:40 PM)
+        let greeting = 'Selamat Sore'; // 04:40 PM (16:40) falls in "Sore"
+        if (hour < 12) greeting = 'Selamat Pagi';
+        else if (hour < 15) greeting = 'Selamat Siang';
+        else if (hour < 18) greeting = 'Selamat Sore';
+        else greeting = 'Selamat Malam';
+        const greetingElement = document.querySelector('.welcome-banner .greeting');
+        if (greetingElement) greetingElement.textContent = greeting;
+
+        // Sidebar and toggle elements
+        const menuToggle = document.querySelector('.menu-toggle');
+        const sidebar = document.querySelector('.sidebar');
+        const mainContent = document.querySelector('.main-content');
+        const sidebarToggle = document.querySelector('.sidebar-toggle');
+
+        // Initialize sidebar state
+        function updateSidebarState() {
+            if (window.innerWidth > 992) {
+                sidebar.classList.remove('minimized', 'collapsed-mobile', 'expanded');
+                mainContent.style.marginLeft = getComputedStyle(document.documentElement).getPropertyValue('--sidebar-width').trim();
+            } else if (window.innerWidth <= 992 && window.innerWidth > 768) {
+                sidebar.classList.add('minimized');
+                sidebar.classList.remove('collapsed-mobile', 'expanded');
+                mainContent.style.marginLeft = getComputedStyle(document.documentElement).getPropertyValue('--sidebar-min-width').trim();
+            } else {
+                sidebar.classList.add('collapsed-mobile');
+                sidebar.classList.remove('minimized', 'expanded');
+                mainContent.style.marginLeft = '0px';
+            }
+        }
+
+        // Run initial state
+        updateSidebarState();
+
+        // Toggle sidebar for mobile
+        if (menuToggle && sidebar) {
+            menuToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                sidebar.classList.toggle('expanded');
+                if (window.innerWidth <= 768) {
+                    mainContent.style.marginLeft = sidebar.classList.contains('expanded') ? '0' : '0';
+                    document.body.style.overflow = sidebar.classList.contains('expanded') ? 'hidden' : '';
+                } else if (window.innerWidth <= 992) {
+                    mainContent.style.marginLeft = sidebar.classList.contains('expanded')
+                        ? getComputedStyle(document.documentElement).getPropertyValue('--sidebar-width').trim()
+                        : getComputedStyle(document.documentElement).getPropertyValue('--sidebar-min-width').trim();
+                }
+            });
+        }
+
+        // Minimize/expand sidebar
+        if (sidebarToggle && sidebar) {
+            sidebarToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('minimized');
+                mainContent.style.marginLeft = sidebar.classList.contains('minimized')
+                    ? getComputedStyle(document.documentElement).getPropertyValue('--sidebar-min-width').trim()
+                    : getComputedStyle(document.documentElement).getPropertyValue('--sidebar-width').trim();
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.remove('expanded');
+                    mainContent.style.marginLeft = '0';
+                    document.body.style.overflow = '';
+                }
+            });
+        }
+
+        // Close sidebar on outside click (mobile only)
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768 && sidebar.classList.contains('expanded') && !sidebar.contains(e.target) && !menuToggle.contains(e.target)) {
+                sidebar.classList.remove('expanded');
+                document.body.style.overflow = '';
+            }
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', updateSidebarState);
+
+        // Dropdown toggle
+        document.querySelectorAll('.dropdown-toggle').forEach(toggle => {
+            toggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                const dropdownMenu = toggle.nextElementSibling;
+                const bsCollapse = new bootstrap.Collapse(dropdownMenu, { toggle: true });
+            });
+        });
+
+        // Initialize counters with dynamic data
+        await initializeCounters();
+
+        // Fetch chart data dynamically
+        const kondisiAsetChartConfig = await fetchAssetConditions();
+        const jenisAsetChartConfig = await fetchAssetTypes();
+
+        // Initialize Charts
+        const kondisiAsetChart = initChart('kondisiAsetChart', kondisiAsetChartConfig);
+        const jenisAsetChart = initChart('jenisAsetChart', jenisAsetChartConfig);
+
+        // Handle window resize for charts
+        const resizeCharts = () => {
+            if (kondisiAsetChart) kondisiAsetChart.resize();
+            if (jenisAsetChart) jenisAsetChart.resize();
+        };
+        window.addEventListener('resize', resizeCharts);
+        
+        document.getElementById('userProfileLink').addEventListener('click', function() {
+    window.location.href = 'user-profile.html';
+});
+
+// Tambahkan cursor pointer via CSS
+document.getElementById('userProfileLink').style.cursor = 'pointer';
+
+        // Chart button functionality
+        document.querySelectorAll('.chart-actions button').forEach(button => {
+            button.addEventListener('click', () => {
+                const icon = button.querySelector('i');
+                const chartContainer = button.closest('.chart-container');
+                if (icon.classList.contains('fa-sync-alt')) {
+                    icon.classList.add('fa-spin');
+                    setTimeout(() => icon.classList.remove('fa-spin'), 1000);
+                } else {
+                    chartContainer.classList.toggle('fullscreen');
+                    icon.classList.toggle('fa-expand');
+                    icon.classList.toggle('fa-compress');
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>
