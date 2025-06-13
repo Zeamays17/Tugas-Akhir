@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Aplikasi Maintenance Aset</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+  
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  :root {
+    --color-primary: #4f46e5;
+    --color-primary-dark: #3730a3;
+    --color-bg: #f5f5f5;
+    --color-card-bg: #ffffff;
+    --color-text: #333;
+    --color-muted: #6b7280;
+    --border-radius: 12px;
+    --spacing-unit: 16px;
+  }
+
+  body {
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    line-height: 1.5;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 16px;
+  }
+
+  .container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  .header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 30px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 900px;
+    text-align: center;
+  }
+
+  .header h1 {
+    font-size: 2.5em;
+    margin-bottom: 10px;
+    font-weight: 700;
+  }
+
+  .breadcrumb {
+    opacity: 0.9;
+    font-size: 0.9em;
+  }
+
+  main {
+    width: 100%;
+    max-width: 900px;
+    background: var(--color-card-bg);
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 20px rgb(0 0 0 / 0.1);
+    padding: 32px;
+  }
+
+  .btn {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .btn:hover {
+    background: #0056b3;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,123,255,0.3);
+  }
+
+  .btn-success {
+    background: #28a745;
+  }
+
+  .btn-success:hover {
+    background: #1e7e34;
+  }
+
+  .btn-warning {
+    background: #ffc107;
+    color: #212529;
+  }
+
+  .btn-warning:hover {
+    background: #e0a800;
+  }
+
+  .btn-danger {
+    background: #dc3545;
+  }
+
+  .btn-danger:hover {
+    background: #c82333;
+  }
+
+  .btn-secondary {
+    background: #6c757d;
+  }
+
+  .btn-secondary:hover {
+    background: #545b62;
+  }
+
+  .btn-info {
+    background: #17a2b8;
+  }
+
+  .btn-info:hover {
+    background: #138496;
+  }
+
+  h2 {
+    margin-top: 0;
+    margin-bottom: 24px;
+    font-weight: 600;
+    color: var(--color-primary-dark);
+  }
+
+  form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-unit);
+    margin-bottom: 32px;
+  }
+
+  @media (max-width: 640px) {
+    form {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  label {
+    display: flex;
+    flex-direction: column;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: 4px;
+  }
+
+  input[type="text"],
+  input[type="number"],
+  input[type="date"],
+  textarea,
+  select {
+    padding: 12px 15px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    width: 100%;
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 80px;
+    font-family: inherit;
+  }
+
+  input[type="text"]:focus,
+  input[type="number"]:focus,
+  input[type="date"]:focus,
+  textarea:focus,
+  select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+  }
+
+  button[type="submit"] {
+    grid-column: 1 / -1;
+    padding: 14px 0;
+    background: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius);
+    font-weight: 700;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  button[type="submit"]:hover {
+    background: var(--color-primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+  }
+
+  .table-container {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    overflow: hidden;
+    margin-top: 20px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+
+  th, td {
+    text-align: left;
+    padding: 15px 12px;
+    border-bottom: 1px solid #e9ecef;
+  }
+
+  th {
+    background: #f8f9fa;
+    font-weight: 600;
+    color: #495057;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  tbody tr:hover {
+    background-color: #f8f9fa;
+  }
+
+  .text-center {
+    text-align: center;
+  }
+
+  .btn-delete {
+    background: transparent;
+    border: none;
+    color: #dc3545;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 0.9rem;
+    padding: 6px 12px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+  }
+
+  .btn-delete:hover {
+    background-color: #f8d7da;
+    color: #721c24;
+    transform: translateY(-1px);
+  }
+
+  .empty-message {
+    font-style: italic;
+    color: var(--color-muted);
+    text-align: center;
+    padding: 60px 20px;
+  }
+
+  .status {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    text-align: center;
+    display: inline-block;
+    min-width: 80px;
+  }
+
+  .status-terjadwal {
+    background: #fff3cd;
+    color: #856404;
+  }
+
+  .status-berlangsung {
+    background: #d1ecf1;
+    color: #0c5460;
+  }
+
+  .status-selesai {
+    background: #d4edda;
+    color: #155724;
+  }
+
+  .status-tertunda {
+    background: #f8d7da;
+    color: #721c24;
+  }
+
+  .priority {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    display: inline-block;
+    min-width: 60px;
+    text-align: center;
+  }
+
+  .priority-rendah {
+    background: #d4edda;
+    color: #155724;
+  }
+
+  .priority-sedang {
+    background: #fff3cd;
+    color: #856404;
+  }
+
+  .priority-tinggi {
+    background: #f8d7da;
+    color: #721c24;
+  }
+
+  .priority-urgent {
+    background: #d1b3ff;
+    color: #4a148c;
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+  }
+
+  .btn-sm {
+    padding: 6px 12px;
+    font-size: 12px;
+    min-width: auto;
+  }
+
+  .navigation-section {
+    margin-top: 32px;
+    text-align: center;
+  }
+
+  .form-full-width {
+    grid-column: 1 / -1;
+  }
+
+  .filter-section {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    display: flex;
+    gap: 15px;
+    align-items: end;
+    flex-wrap: wrap;
+  }
+
+  .filter-group {
+    display: flex;
+    flex-direction: column;
+    min-width: 150px;
+  }
+
+  .filter-group label {
+    margin-bottom: 5px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .filter-group select {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+
+  .stats-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+  }
+
+  .stat-card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    text-align: center;
+    transition: transform 0.3s ease;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-3px);
+  }
+
+  .stat-number {
+    font-size: 2em;
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+
+  .stat-label {
+    color: var(--color-muted);
+    font-size: 0.9em;
+  }
+
+  .stat-terjadwal .stat-number { color: #856404; }
+  .stat-berlangsung .stat-number { color: #0c5460; }
+  .stat-selesai .stat-number { color: #155724; }
+  .stat-tertunda .stat-number { color: #721c24; }
+
+  @media (max-width: 768px) {
+    .container {
+      padding: 10px;
+    }
+    
+    .table-container {
+      overflow-x: auto;
+    }
+    
+    main {
+      padding: 20px;
+    }
+
+    .header h1 {
+      font-size: 2em;
+    }
+
+    .filter-section {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .filter-group {
+      min-width: auto;
+    }
+
+    .action-buttons {
+      flex-direction: column;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>Aplikasi Maintenance Aset</h1>
+  <div class="breadcrumb">Sistem Manajemen Pemeliharaan Aset</div>
+</div>
+
+<main>
+  <!-- Statistics Section -->
+  <section class="stats-section">
+    <div class="stat-card stat-terjadwal">
+      <div class="stat-number" id="stat-terjadwal">0</div>
+      <div class="stat-label">Terjadwal</div>
+    </div>
+    <div class="stat-card stat-berlangsung">
+      <div class="stat-number" id="stat-berlangsung">0</div>
+      <div class="stat-label">Berlangsung</div>
+    </div>
+    <div class="stat-card stat-selesai">
+      <div class="stat-number" id="stat-selesai">0</div>
+      <div class="stat-label">Selesai</div>
+    </div>
+    <div class="stat-card stat-tertunda">
+      <div class="stat-number" id="stat-tertunda">0</div>
+      <div class="stat-label">Tertunda</div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Tambah Jadwal Maintenance</h2>
+    <form id="form-maintenance">
+      <label>
+        Nama Aset
+        <input type="text" id="namaAset" name="namaAset" required autocomplete="off" />
+      </label>
+      <label>
+        Jenis Maintenance
+        <select id="jenisMaintenance" name="jenisMaintenance" required>
+          <option value="" disabled selected>Pilih jenis maintenance</option>
+          <option value="Preventif">Preventif</option>
+          <option value="Korektif">Korektif</option>
+          <option value="Prediktif">Prediktif</option>
+          <option value="Darurat">Darurat</option>
+        </select>
+      </label>
+      <label>
+        Prioritas
+        <select id="prioritas" name="prioritas" required>
+          <option value="" disabled selected>Pilih prioritas</option>
+          <option value="Rendah">Rendah</option>
+          <option value="Sedang">Sedang</option>
+          <option value="Tinggi">Tinggi</option>
+          <option value="Urgent">Urgent</option>
+        </select>
+      </label>
+      <label>
+        Tanggal Terjadwal
+        <input type="date" id="tanggalTerjadwal" name="tanggalTerjadwal" required />
+      </label>
+      <label>
+        Teknisi
+        <input type="text" id="teknisi" name="teknisi" required autocomplete="off" />
+      </label>
+      <label>
+        Estimasi Biaya
+        <input type="number" id="estimasiBiaya" name="estimasiBiaya" min="0" step="1000" placeholder="0" />
+      </label>
+      <label class="form-full-width">
+        Deskripsi
+        <textarea id="deskripsi" name="deskripsi" placeholder="Deskripsi detail maintenance yang akan dilakukan..."></textarea>
+      </label>
+
+      <button type="submit">Tambahkan Jadwal Maintenance</button>
+    </form>
+  </section>
+
+  <!-- Filter Section -->
+  <section class="filter-section">
+    <div class="filter-group">
+      <label>Status</label>
+      <select id="filter-status">
+        <option value="">Semua Status</option>
+        <option value="Terjadwal">Terjadwal</option>
+        <option value="Berlangsung">Berlangsung</option>
+        <option value="Selesai">Selesai</option>
+        <option value="Tertunda">Tertunda</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Prioritas</label>
+      <select id="filter-prioritas">
+        <option value="">Semua Prioritas</option>
+        <option value="Rendah">Rendah</option>
+        <option value="Sedang">Sedang</option>
+        <option value="Tinggi">Tinggi</option>
+        <option value="Urgent">Urgent</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Jenis</label>
+      <select id="filter-jenis">
+        <option value="">Semua Jenis</option>
+        <option value="Preventif">Preventif</option>
+        <option value="Korektif">Korektif</option>
+        <option value="Prediktif">Prediktif</option>
+        <option value="Darurat">Darurat</option>
+      </select>
+    </div>
+    <button type="button" class="btn btn-secondary" onclick="resetFilters()">Reset Filter</button>
+  </section>
+
+  <section>
+    <h2>Daftar Maintenance</h2>
+    <div class="table-container">
+      <table aria-label="Daftar maintenance aset" id="tabel-maintenance" role="grid">
+        <thead>
+          <tr role="row">
+            <th role="columnheader">Nama Aset</th>
+            <th role="columnheader">Jenis</th>
+            <th role="columnheader">Prioritas</th>
+            <th role="columnheader">Teknisi</th>
+            <th role="columnheader">Tanggal</th>
+            <th role="columnheader">Status</th>
+            <th role="columnheader">Estimasi Biaya(*Rp)</th>
+            <th role="columnheader" class="text-center">Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="daftar-maintenance-body">
+          <tr><td colspan="8" class="empty-message">Belum ada jadwal maintenance.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="navigation-section">
+    <a href="index.html" class="btn btn-secondary" style="background: rgb(244, 49, 10); color: rgb(255, 255, 255); border: 1px solid rgba(255,255,255,0.3);">
+                    Kembali
+                </a>
+  </section>
+</main>
+
+<script>
+  // Helper to format date from yyyy-mm-dd to dd-mm-yyyy (Indonesia format)
+  function formatTanggal(dateString) {
+    const date = new Date(dateString + 'T00:00:00');
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth()+1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+  }
+
+  // Helper to format currency
+  function formatRupiah(amount) {
+    if (!amount || amount === 0) return 'Rp 0';
+    return 'Rp ' + amount.toLocaleString('id-ID');
+  }
+
+  // Helper to determine status based on date
+  function getStatus(tanggalTerjadwal, currentStatus) {
+    if (currentStatus === 'Selesai') return 'Selesai';
+    
+    const today = new Date();
+    const scheduledDate = new Date(tanggalTerjadwal + 'T00:00:00');
+    
+    if (scheduledDate < today && currentStatus !== 'Selesai') {
+      return 'Tertunda';
+    }
+    
+    return currentStatus || 'Terjadwal';
+  }
+
+  // Data storage
+  let maintenanceData = [];
+  let filteredData = [];
+
+  const daftarBody = document.getElementById('daftar-maintenance-body');
+  const formMaintenance = document.getElementById('form-maintenance');
+
+  // Update statistics
+  function updateStats() {
+    const stats = {
+      'Terjadwal': 0,
+      'Berlangsung': 0,
+      'Selesai': 0,
+      'Tertunda': 0
+    };
+
+    maintenanceData.forEach(item => {
+      const status = getStatus(item.tanggalTerjadwal, item.status);
+      stats[status]++;
+    });
+
+    document.getElementById('stat-terjadwal').textContent = stats['Terjadwal'];
+    document.getElementById('stat-berlangsung').textContent = stats['Berlangsung'];
+    document.getElementById('stat-selesai').textContent = stats['Selesai'];
+    document.getElementById('stat-tertunda').textContent = stats['Tertunda'];
+  }
+
+  // Apply filters
+  function applyFilters() {
+    const statusFilter = document.getElementById('filter-status').value;
+    const prioritasFilter = document.getElementById('filter-prioritas').value;
+    const jenisFilter = document.getElementById('filter-jenis').value;
+
+    filteredData = maintenanceData.filter(item => {
+      const status = getStatus(item.tanggalTerjadwal, item.status);
+      
+      return (!statusFilter || status === statusFilter) &&
+             (!prioritasFilter || item.prioritas === prioritasFilter) &&
+             (!jenisFilter || item.jenisMaintenance === jenisFilter);
+    });
+
+    renderMaintenance();
+  }
+
+  // Reset filters
+  function resetFilters() {
+    document.getElementById('filter-status').value = '';
+    document.getElementById('filter-prioritas').value = '';
+    document.getElementById('filter-jenis').value = '';
+    filteredData = [...maintenanceData];
+    renderMaintenance();
+  }
+
+  // Change status
+  function changeStatus(index, newStatus) {
+    const originalIndex = maintenanceData.findIndex(item => 
+      item === filteredData[index]
+    );
+    if (originalIndex !== -1) {
+      maintenanceData[originalIndex].status = newStatus;
+      applyFilters();
+      updateStats();
+    }
+  }
+
+  // Render maintenance table
+  function renderMaintenance() {
+    if (filteredData.length === 0) {
+      daftarBody.innerHTML = '<tr><td colspan="8" class="empty-message">Tidak ada data maintenance yang sesuai filter.</td></tr>';
+      return;
+    }
+
+    daftarBody.innerHTML = '';
+    filteredData.forEach((maintenance, index) => {
+      const status = getStatus(maintenance.tanggalTerjadwal, maintenance.status);
+      const tr = document.createElement('tr');
+      tr.setAttribute('role', 'row');
+      
+      tr.innerHTML = `
+        <td>${maintenance.namaAset}</td>
+        <td>${maintenance.jenisMaintenance}</td>
+        <td><span class="priority priority-${maintenance.prioritas.toLowerCase()}">${maintenance.prioritas}</span></td>
+        <td>${maintenance.teknisi}</td>
+        <td>${formatTanggal(maintenance.tanggalTerjadwal)}</td>
+        <td><span class="status status-${status.toLowerCase()}">${status}</span></td>
+        <td>${formatRupiah(maintenance.estimasiBiaya)}</td>
+        <td class="text-center">
+          <div class="action-buttons">
+            ${status !== 'Selesai' ? `
+              <button class="btn btn-sm btn-info" onclick="changeStatus(${index}, 'Berlangsung')" 
+                      ${status === 'Berlangsung' ? 'disabled' : ''}>
+                ${status === 'Berlangsung' ? 'Berlangsung' : 'Mulai'}
+              </button>
+              <button class="btn btn-sm btn-success" onclick="changeStatus(${index}, 'Selesai')">Selesai</button>
+            ` : ''}
+            <button aria-label="Hapus maintenance ${maintenance.namaAset}" 
+                    class="btn btn-sm btn-danger" onclick="deleteMaintenance(${index})">Hapus</button>
+          </div>
+        </td>
+      `;
+      daftarBody.appendChild(tr);
+    });
+  }
+
+  // Delete maintenance
+  function deleteMaintenance(index) {
+    const maintenance = filteredData[index];
+    const originalIndex = maintenanceData.findIndex(item => item === maintenance);
+    
+    if (originalIndex !== -1 && confirm(`Apakah Anda yakin ingin menghapus maintenance "${maintenance.namaAset}"?`)) {
+      maintenanceData.splice(originalIndex, 1);
+      applyFilters();
+      updateStats();
+    }
+  }
+
+  // Form submission
+  formMaintenance.addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    const namaAset = formMaintenance.namaAset.value.trim();
+    const jenisMaintenance = formMaintenance.jenisMaintenance.value;
+    const prioritas = formMaintenance.prioritas.value;
+    const tanggalTerjadwal = formMaintenance.tanggalTerjadwal.value;
+    const teknisi = formMaintenance.teknisi.value.trim();
+    const estimasiBiaya = parseInt(formMaintenance.estimasiBiaya.value) || 0;
+    const deskripsi = formMaintenance.deskripsi.value.trim();
+
+    if (!namaAset || !jenisMaintenance || !prioritas || !tanggalTerjadwal || !teknisi) {
+      alert('Semua bidang wajib harus diisi.');
+      return;
+    }
+
+    const newMaintenance = {
+      namaAset,
+      jenisMaintenance,
+      prioritas,
+      tanggalTerjadwal,
+      teknisi,
+      estimasiBiaya,
+      deskripsi,
+      status: 'Terjadwal',
+      tanggalDibuat: new Date().toISOString().split('T')[0]
+    };
+
+    maintenanceData.push(newMaintenance);
+    applyFilters();
+    updateStats();
+    formMaintenance.reset();
+    
+    alert('Jadwal maintenance berhasil ditambahkan!');
+  });
+
+  // Event listeners for filters
+  document.getElementById('filter-status').addEventListener('change', applyFilters);
+  document.getElementById('filter-prioritas').addEventListener('change', applyFilters);
+  document.getElementById('filter-jenis').addEventListener('change', applyFilters);
+
+  // Initialize
+  filteredData = [...maintenanceData];
+  renderMaintenance();
+  updateStats();
+</script>
+</body>
+</html>
